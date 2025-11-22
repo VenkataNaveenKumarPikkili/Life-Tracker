@@ -1,21 +1,36 @@
-import { Outlet, Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-export default function Layout() {
+export default function Layout({ children }) {
+  const navigate = useNavigate();
+  const token = localStorage.getItem("accessToken");
+
+  function logout() {
+    localStorage.removeItem("accessToken");
+    navigate("/auth/login");
+  }
+
   return (
-    <div style={{ display: "flex", height: "100vh" }}>
-      <aside style={{ width: "220px", background: "#202123", color: "white", padding: "20px" }}>
-        <h2>Life Planner</h2>
-        <nav>
-          <ul style={{ listStyle: "none", padding: 0 }}>
-            <li><Link to="/" style={{ color: "white" }}>Dashboard</Link></li>
-            <li><Link to="/habits" style={{ color: "white" }}>Habits</Link></li>
-          </ul>
-        </nav>
-      </aside>
+    <div>
+      {token && (
+        <nav style={{ padding: "10px", borderBottom: "1px solid #ccc" }}>
+          <Link to="/dashboard" style={{ marginRight: "15px" }}>Dashboard</Link>
+          <Link to="/habits" style={{ marginRight: "15px" }}>Habits</Link>
 
-      <main style={{ flex: 1, padding: "20px" }}>
-        <Outlet />
-      </main>
+          <button
+            onClick={logout}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: "blue",
+            }}
+          >
+            Logout
+          </button>
+        </nav>
+      )}
+
+      <main style={{ padding: "20px" }}>{children}</main>
     </div>
   );
 }
