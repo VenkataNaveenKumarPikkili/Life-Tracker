@@ -1,60 +1,68 @@
-// src/pages/Register.jsx
-import React, { useState } from "react";
-import { registerUser } from "../api/auth";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { registerUser, setAuthHeader } from "../api/auth";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Register() {
-  const navigate = useNavigate();
-
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [msg, setMsg] = useState(null);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setError("");
     try {
-      await registerUser(name, email, password);
-      setMsg("Registration successful!");
-      setTimeout(() => navigate("/"), 1000);
+      const data = await registerUser(name, email, password);
+      const token = data.token || data.accessToken || data.jwt;
+      if (token) {
+        localStorage.setItem("token", token);
+        setAuthHeader(token);
+        navigate("/dashboard");
+      } else {
+        // if your backend just returns user without token, navigate but don't set token
+        navigate("/");
+      }
     } catch (err) {
       console.error(err);
-      setMsg("Registration failed");
+      setError("Registration failed");
     }
   };
 
   return (
-    <div>
+    <div style={{ padding: "2rem" }}>
       <h2>Register</h2>
-
-      {msg && <p>{msg}</p>}
-
       <form onSubmit={handleSubmit}>
-        <input
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-
-        <input
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-
-        <input
-          placeholder="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
+        <div>
+          <label>Name:&nbsp;</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+        <div>
+          <label>Email:&nbsp;</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+        <div>
+          <label>Password:&nbsp;</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        {error && <p style={{ color: "red" }}>{error}</p>}
         <button type="submit">Register</button>
       </form>
-
-      <br />
-      <Link to="/">Already have an account? Login</Link>
+      <p>
+        Already have an account? <Link to="/">Login</Link>
+      </p>
     </div>
   );
 }

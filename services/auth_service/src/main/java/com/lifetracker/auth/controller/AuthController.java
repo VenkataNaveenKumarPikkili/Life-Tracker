@@ -1,51 +1,33 @@
-package com.lifetracker.auth.controller;
-
-import com.lifetracker.auth.dto.LoginRequest;
-import com.lifetracker.auth.dto.SignupRequest;
-import com.lifetracker.auth.dto.TokenResponse;
-import com.lifetracker.auth.dto.UserResponse;
-import com.lifetracker.auth.security.JwtUtil;
-import com.lifetracker.auth.service.UserService;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
+@CrossOrigin(origins = "http://localhost:3000")
 public class AuthController {
 
-    private final UserService userService;
-    private final JwtUtil jwtUtil;
+    private final AuthService authService;
 
-    public AuthController(UserService userService, JwtUtil jwtUtil) {
-        this.userService = userService;
-        this.jwtUtil = jwtUtil;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
 
-    @PostMapping("/signup")
-    public TokenResponse signup(@RequestBody SignupRequest req) {
-        String token = userService.signup(req);
-        return new TokenResponse(token);
+    @PostMapping("/register")
+    public ResponseEntity<UserResponse> register(@RequestBody RegisterRequest request) {
+        UserResponse user = authService.register(request);
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/login")
-    public TokenResponse login(@RequestBody LoginRequest req) {
-        String token = userService.login(req);
-        return new TokenResponse(token);
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+        LoginResponse resp = authService.login(request);
+        return ResponseEntity.ok(resp);
     }
 
     @GetMapping("/me")
-    public UserResponse me(@RequestHeader("Authorization") String header) {
-        String token = header.replace("Bearer ", "");
-        // extract userId string then convert to UUID
-        String userIdString = jwtUtil.extractUserId(token);
-        UUID userId = UUID.fromString(userIdString);
-        var user = userService.getUserById(userId);
-        return new UserResponse(user.getUserId().toString(), user.getEmail(), user.getName());
-    }
-
-    @GetMapping("/health")
-    public String health() {
-        return "{\"status\": \"ok\"}";
+    public ResponseEntity<UserResponse> me(@RequestHeader("Authorization") String authHeader) {
+        UserResponse user = authService.getMe(authHeader);
+        return ResponseEntity.ok(user);
     }
 }

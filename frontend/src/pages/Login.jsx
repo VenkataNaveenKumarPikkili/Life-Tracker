@@ -1,65 +1,58 @@
-// src/pages/Login.jsx
-import React, { useState } from "react";
+import { useState } from "react";
 import { loginUser, setAuthHeader } from "../api/auth";
 import { useNavigate, Link } from "react-router-dom";
 
-function Login() {
-  const navigate = useNavigate();
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [msg, setMsg] = useState(null);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setError("");
     try {
-      const response = await loginUser(email, password);
-
-      if (response?.data?.token) {
-        const token = response.data.token;
-
+      const data = await loginUser(email, password); // expecting { token: "..." }
+      const token = data.token || data.accessToken || data.jwt; // adjust to your backend
+      if (token) {
         localStorage.setItem("token", token);
         setAuthHeader(token);
-
         navigate("/dashboard");
       } else {
-        setMsg("Login failed: No token returned");
+        setError("Login successful but token missing in response");
       }
     } catch (err) {
       console.error(err);
-      const message =
-        err?.response?.data?.message || "Login failed - unknown error";
-      setMsg(message);
+      setError("Login failed");
     }
   };
 
   return (
-    <div>
+    <div style={{ padding: "2rem" }}>
       <h2>Login</h2>
-
-      {msg && <p style={{ color: "red" }}>{msg}</p>}
-
       <form onSubmit={handleSubmit}>
-        <input
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-
-        <input
-          placeholder="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
+        <div>
+          <label>Email:&nbsp;</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+        <div>
+          <label>Password:&nbsp;</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        {error && <p style={{ color: "red" }}>{error}</p>}
         <button type="submit">Login</button>
       </form>
-
-      <br />
-      <Link to="/register">Create an account</Link>
+      <p>
+        No account? <Link to="/register">Register</Link>
+      </p>
     </div>
   );
 }
-
-export default Login;

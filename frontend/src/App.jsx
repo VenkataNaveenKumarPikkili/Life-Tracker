@@ -1,22 +1,15 @@
-// src/App.jsx
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
-import { setAuthHeader } from "./api/auth";
-
-// Load token on app start
-const token = localStorage.getItem("token");
-if (token) {
-  setAuthHeader(token);
-}
+import Habits from "./pages/Habits";
 
 function PrivateRoute({ children }) {
   const token = localStorage.getItem("token");
   return token ? children : <Navigate to="/" replace />;
 }
 
-function App() {
+export default function App() {
   return (
     <BrowserRouter>
       <Routes>
@@ -33,9 +26,15 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/habits"
+          element={
+            <PrivateRoute>
+              <Habits />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
 }
-
-export default App;
