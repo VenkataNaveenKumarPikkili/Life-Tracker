@@ -1,0 +1,67 @@
+.register-page {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #1b2b5b, #264a8a);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.register-card {
+  background: #ffffff;
+  width: 380px;
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.title {
+  font-size: 36px;
+  color: #ffffff;
+  position: absolute;
+  top: 40px;
+  font-weight: 700;
+  text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.register-input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  background: #f3f3f3;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.register-btn {
+  width: 100%;
+  background: #ffb800;
+  border: none;
+  padding: 12px;
+  margin-top: 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.register-btn:hover {
+  background: #ff9900;
+}
+
+.auth-links {
+  margin-top: 18px;
+}
+
+.auth-links a {
+  color: #1d4ed8;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-links a:hover {
+  text-decoration: underline;
+}

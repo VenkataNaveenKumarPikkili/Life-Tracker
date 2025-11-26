@@ -1,0 +1,62 @@
+/* 🔥 FULLSCREEN FIX */
+.auth-wrapper {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  padding: 20px;
+}
+
+/* Card */
+.auth-card {
+  width: 380px;
+  padding: 40px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+/* Logo */
+.app-logo {
+  color: white;
+  font-size: 40px;
+  margin-bottom: 15px;
+}
+
+/* Inputs */
+.auth-card input {
+  width: 100%;
+  padding: 14px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
+
+/* Button */
+.auth-card button {
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px;
+  background: #ffb400;
+  border: none;
+  border-radius: 8px;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+/* Switch link */
+.switch-link {
+  margin-top: 12px;
+  color: white;
+}
+
+.switch-link span {
+  color: #ffdd57;
+  cursor: pointer;
+  font-weight: 600;
+}

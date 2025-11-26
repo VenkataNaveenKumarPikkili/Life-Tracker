@@ -1,0 +1,33 @@
+:root {
+  --bg1: #4facfe;
+  --bg2: #c471ed;
+  --glass: rgba(255, 255, 255, 0.28);
+  --glass-border: rgba(255, 255, 255, 0.35);
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.vision-dashboard {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(120deg, var(--bg1), var(--bg2));
+  position: relative;
+  overflow-x: hidden;
+}
+:root{
+  --g-left: #3AA2FF;
+  --g-right: #B36CFF;
+  --accent: #36D1DC;
+  --accent-2: #8E8CFF;
+  --danger: #FF6B60;
+  --surface: #FFFFFF;
+}
+
+body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial}
+.hidden{display:none}
+.btn{padding:10px 14px;border-radius:8px;border:none;cursor:pointer}
