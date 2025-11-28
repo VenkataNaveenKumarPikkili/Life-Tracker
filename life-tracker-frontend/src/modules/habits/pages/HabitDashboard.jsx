@@ -1,208 +1,150 @@
-// src/modules/habits/pages/HabitDashboard.jsx
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import AnalyticsPro from "../components/AnalyticsPro";
 import AICoachV3 from "../components/AICoachV3";
 import "../styles/habits.css";
 
-export default function HabitDashboard() {
-  // ---------- DATE ----------
-  const today = new Date();
-  const [month, setMonth] = useState(today.getMonth());
-  const [year, setYear] = useState(today.getFullYear());
+const today = new Date();
 
-  const daysInMonth = useMemo(
-    () => new Date(year, month + 1, 0).getDate(),
-    [year, month]
-  );
+// Compare YYYY/MM
+function compare(y1,m1,y2,m2){
+  if(y1<m2) return -1;
+  if(y1>y2) return 1;
+  if(m1<m2) return -1;
+  if(m1>m2) return 1;
+  return 0;
+}
 
-  const monthLabel = useMemo(
-    () =>
-      new Date(year, month).toLocaleString("en-US", {
-        month: "long",
-        year: "numeric",
-      }),
-    [year, month]
-  );
+export default function HabitDashboard(){
 
-  // ---------- HABITS ----------
-  const [habits, setHabits] = useState(() => {
-    try {
-      const raw = localStorage.getItem("habits");
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
-  });
+  const [month,setMonth]=useState(today.getMonth());
+  const [year,setYear]=useState(today.getFullYear());
+  const [input,setInput]=useState("");
 
-  const [habitInput, setHabitInput] = useState("");
+  const [start,setStart]=useState(()=>JSON.parse(localStorage.getItem("habitStart")||"null"));
 
-  // persist
-  useEffect(() => {
-    localStorage.setItem("habits", JSON.stringify(habits));
-  }, [habits]);
+  const key=`habit-${year}-${month}`;
+  const [habits,setHabits]=useState(()=>JSON.parse(localStorage.getItem(key)||"[]"));
 
-  // ---------- MUTATORS ----------
-  const addHabit = () => {
-    const name = habitInput.trim();
-    if (!name) return;
+  const days=new Date(year,month+1,0).getDate();
+  const label=new Date(year,month).toLocaleString("en",{month:"long",year:"numeric"});
 
-    setHabits((prev) => [
-      ...prev,
-      {
-        name,
-        tracker: [], // entries: { day: number, done: boolean }
-      },
-    ]);
-    setHabitInput("");
-  };
+  // load month change
+  useEffect(()=>{
+    setHabits(JSON.parse(localStorage.getItem(key)||"[]"));
+  },[key]);
 
-  const toggleDay = (habitIndex, day) => {
-    // Only allow toggling for TODAY or PAST — future days locked
-    const now = new Date();
-    const isSameMonth =
-      month === now.getMonth() && year === now.getFullYear();
-    const todayNumber = now.getDate();
+  // save month state
+  useEffect(()=>{
+    localStorage.setItem(key,JSON.stringify(habits));
+  },[habits])
 
-    if (!isSameMonth || day > todayNumber) {
-      return; // ignore future clicks
+  const addHabit=()=>{
+    if(!input.trim()) return;
+
+    // Set starting month only once
+    if(!start){
+      const s={year,month};
+      setStart(s);
+      localStorage.setItem("habitStart",JSON.stringify(s));
     }
 
-    setHabits((prev) => {
-      const copy = [...prev];
-      const habit = { ...copy[habitIndex] };
-      const tracker = habit.tracker ? [...habit.tracker] : [];
+    setHabits(p=>[...p,{name:input,tracker:{}}]);
+    setInput("");
+  };
 
-      const idx = tracker.findIndex((t) => t.day === day);
-      if (idx >= 0) {
-        tracker[idx] = {
-          ...tracker[idx],
-          done: !tracker[idx].done,
-        };
-      } else {
-        tracker.push({ day, done: true });
-      }
+  const toggle=(i,day)=>{
+    const futureMonth = compare(year,month,today.getFullYear(),today.getMonth())===1;
+    if(futureMonth) return;
 
-      habit.tracker = tracker;
-      copy[habitIndex] = habit;
-      return copy;
+    const futureDay = (month===today.getMonth() && year===today.getFullYear() && day>today.getDate());
+    if(futureDay) return;
+
+    setHabits(p=>{
+      let list=[...p];
+      let h={...list[i]};
+      let t={...(h.tracker||{})};
+      t[day]=!t[day];
+      h.tracker=t;
+      list[i]=h;
+      return list;
     });
   };
 
-  const removeHabit = (index) => {
-    setHabits((prev) => prev.filter((_, i) => i !== index));
-  };
+  const remove=i=>setHabits(p=>p.filter((_,x)=>x!==i));
 
-  const goNextMonth = () => {
-    setMonth((m) => {
-      if (m === 11) {
-        setYear((y) => y + 1);
-        return 0;
-      }
-      return m + 1;
-    });
-  };
+  const minStart=start? compare(year,month,start.year,start.month)>=0 : true;
+  const maxToday=compare(year,month,today.getFullYear(),today.getMonth())<=0;
 
-  const goPrevMonth = () => {
-    setMonth((m) => {
-      if (m === 0) {
-        setYear((y) => y - 1);
-        return 11;
-      }
-      return m - 1;
-    });
-  };
-
-  return (
-    <div className="dash">
+  return(
+    <div className="wrapper">
+      
       {/* HEADER */}
-      <header>
-        <h1>🔥 Habit Dashboard PRO</h1>
-        <p>
-          Input left • Month right • Only past/today editable • Analytics & AI on the
-          right.
-        </p>
-      </header>
+      <h1>🔥 Habit Dashboard PRO</h1>
+      <p>Input left • Month selector beside it • Track only present+future months • Analytics on right</p>
 
-      {/* TOP CONTROL BAR */}
-      <div className="topControl">
-        {/* Habit input (left) */}
-        <div className="addBarLeft">
-          <input
-            value={habitInput}
-            maxLength={40}
-            placeholder="Add new habit…"
-            onChange={(e) => setHabitInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && addHabit()}
-          />
+      {/* INPUT + MONTH SIDE-BY-SIDE */}
+      <div className="topControls">
+        
+        <div className="leftInput">
+          <input value={input} placeholder="Add new habit..." onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addHabit()}/>
           <button onClick={addHabit}>Add +</button>
         </div>
 
-        {/* Month selector (right, not touching edge) */}
-        <div className="monthBox">
-          <button onClick={goPrevMonth}>←</button>
-          <h2>{monthLabel}</h2>
-          <button onClick={goNextMonth}>→</button>
+        <div className="rightMonth">
+          <button disabled={!minStart} onClick={()=>setMonth(m=>m===0?(setYear(y=>y-1),11):m-1)}>◀</button>
+          <h2>{label}</h2>
+          <button disabled={!maxToday} onClick={()=>setMonth(m=>m===11?(setYear(y=>y+1),0):m+1)}>▶</button>
         </div>
+
       </div>
 
-      {/* MAIN LAYOUT */}
       <div className="layout">
-        {/* ========== HABIT GRID ========== */}
-        <main className="habits">
-          {/* header row */}
+
+        {/* HABIT GRID */}
+        <main className="tableBox">
+
+          {/* HEADER COLUMNS */}
           <div className="row head">
-            <div className="name">Habit</div>
-            {Array.from({ length: daysInMonth }, (_, i) => (
-              <div key={i} className="dayNum">
-                {i + 1}
-              </div>
-            ))}
-            <div /> {/* delete column */}
+            <div className="nameCell">Habit</div>
+            {Array.from({length:days},(_,i)=>(<div key={i} className="day">{i+1}</div>))}
+            <div></div>
           </div>
 
-          {/* habit rows */}
-          {habits.map((habit, i) => (
+          {/* HABIT ROWS */}
+          {habits.map((h,i)=>(
             <div className="row" key={i}>
-              <div className="name" title={habit.name}>
-                {habit.name.length > 14
-                  ? habit.name.slice(0, 14) + "…"
-                  : habit.name}
-              </div>
+              <div className="nameCell">{h.name}</div>
 
-              {Array.from({ length: daysInMonth }, (_, d) => {
-                const tracker = habit.tracker || [];
-                const record = tracker.find((t) => t.day === d + 1);
-                const done = !!record?.done;
-                return (
-                  <div
-                    key={d}
-                    className={`cell ${done ? "ok" : ""}`}
-                    onClick={() => toggleDay(i, d + 1)}
+              {Array.from({length:days},(_,d)=>{
+                const day=d+1;
+                const done=h.tracker?.[day];
+
+                // disable future
+                const futureDay = (year===today.getFullYear() && month===today.getMonth() && day>today.getDate());
+
+                return(
+                  <div key={d}
+                    className={`cell ${done?"ok":""} ${futureDay?"block":""}`}
+                    onClick={()=>!futureDay && toggle(i,day)}
                   >
-                    {done ? "✔" : ""}
+                    {done?"✔":""}
                   </div>
-                );
+                )
               })}
 
-              <button className="del" onClick={() => removeHabit(i)}>
-                ✕
-              </button>
+              <button className="del" onClick={()=>remove(i)}>✖</button>
             </div>
           ))}
 
-          {habits.length === 0 && (
-            <div className="emptyHint">
-              Start by adding your first habit above 👆
-            </div>
-          )}
         </main>
 
-        {/* ========== RIGHT PANEL ========== */}
+        {/* RIGHT PANEL FIXED + CLEAN */}
         <aside className="rightPanel">
-          <AnalyticsPro habits={habits} days={daysInMonth} />
-          <AICoachV3 habits={habits} days={daysInMonth} />
+          <AnalyticsPro habits={habits} days={days}/>
+          <AICoachV3 habits={habits} days={days}/>
         </aside>
+
       </div>
     </div>
-  );
+  )
 }

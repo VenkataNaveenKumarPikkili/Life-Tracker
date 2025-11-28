@@ -1,123 +1,67 @@
-// src/modules/habits/components/AICoachV3.jsx
 import React, { useMemo } from "react";
 import "../styles/AICoachV3.css";
 
-// same streak helper so coach & analytics agree
-function calcStreak(tracker = [], days) {
-  let current = 0;
-  let best = 0;
+function buildStats(habits, days) {
+  if (!habits || habits.length === 0) return [];
 
-  for (let day = 1; day <= days; day++) {
-    const done = tracker.find((t) => t.day === day && t.done);
-    if (done) {
-      current += 1;
-      if (current > best) best = current;
-    } else {
-      current = 0;
-    }
-  }
-
-  let cur = 0;
-  for (let day = days; day >= 1; day--) {
-    const done = tracker.find((t) => t.day === day && t.done);
-    if (done) cur += 1;
-    else break;
-  }
-  return { current: cur, best };
+  return habits.map((h) => {
+    const tracker = h.tracker || {};
+    const doneCount = Object.keys(tracker).filter((k) => tracker[k]).length;
+    const percent = days > 0 ? Math.round((doneCount / days) * 100) : 0;
+    return { name: h.name, percent };
+  });
 }
 
 export default function AICoachV3({ habits, days }) {
-  const insight = useMemo(() => {
-    if (!habits || habits.length === 0) return null;
+  const stats = useMemo(() => buildStats(habits, days), [habits, days]);
 
-    const extended = habits.map((h) => {
-      const tracker = h.tracker || [];
-      const doneCount = tracker.filter((t) => t.done).length;
-      const percent =
-        days > 0 ? Math.round((doneCount / days) * 100) : 0;
-      const { current, best } = calcStreak(tracker, days);
-      return { name: h.name, percent, current, best };
-    });
-
-    const bestStreak = [...extended].sort(
-      (a, b) => b.current - a.current
-    )[0];
-
-    const weakest = [...extended].sort(
-      (a, b) => a.percent - b.percent
-    )[0];
-
-    const lowStreaks = extended.filter((h) => h.current === 0);
-
-    return { bestStreak, weakest, lowStreaks };
-  }, [habits, days]);
-
-  return (
-    <div className="coachCard">
-      <div className="coachHeader">
-        <div className="titleRow">
+  if (!stats || stats.length === 0) {
+    return (
+      <div className="aiCard">
+        <div className="aiHeader">
           <span className="emoji">🤖</span>
           <span className="title">AI Performance Coach V3</span>
         </div>
-      </div>
-
-      {!insight && (
-        <p className="emptyText">
+        <p className="aiEmpty">
           Add habits & track a few days to unlock AI tips 💡
         </p>
-      )}
+      </div>
+    );
+  }
 
-      {insight && (
-        <div className="coachBody">
-          {insight.bestStreak && insight.bestStreak.current > 0 && (
-            <div className="coachItem positive">
-              <div className="label">🔥 Strongest streak</div>
-              <div className="text">
-                <b>{insight.bestStreak.name}</b> is on a{" "}
-                <b>{insight.bestStreak.current}-day</b> streak. Keep
-                it alive today!
-              </div>
-            </div>
-          )}
+  const strongest = [...stats].sort((a, b) => b.percent - a.percent)[0];
+  const weakest = [...stats].sort((a, b) => a.percent - b.percent)[0];
 
-          {insight.weakest && (
-            <div className="coachItem neutral">
-              <div className="label">📉 Needs intention</div>
-              <div className="text">
-                <b>{insight.weakest.name}</b> is at{" "}
-                <b>{insight.weakest.percent}%</b> this month. Try
-                pairing it with a strong habit or scheduling it
-                earlier in the day.
-              </div>
-            </div>
-          )}
+  return (
+    <div className="aiCard">
+      <div className="aiHeader">
+        <span className="emoji">🤖</span>
+        <span className="title">AI Performance Coach V3</span>
+      </div>
 
-          {insight.lowStreaks && insight.lowStreaks.length > 0 && (
-            <div className="coachItem tip">
-              <div className="label">🧊 Cold habits</div>
-              <div className="text">
-                These habits have no current streak:{" "}
-                {insight.lowStreaks
-                  .map((h) => h.name)
-                  .slice(0, 3)
-                  .join(", ")}
-                .
-                <br />
-                Start with a simple<strong> 2-day mini-streak</strong>{" "}
-                challenge.
-              </div>
-            </div>
-          )}
+      <div className="aiBlock">
+        <h4>🔥 Strongest habit</h4>
+        <p>
+          <strong>{strongest.name}</strong> is at {strongest.percent}% this
+          month. Keep leaning on it for momentum.
+        </p>
+      </div>
 
-          <div className="coachItem micro">
-            <div className="label">💡 Micro-advice</div>
-            <div className="text">
-              Aim for <b>at least 3 days in a row</b> on one habit
-              this week. Tiny streaks compound into big wins.
-            </div>
-          </div>
-        </div>
-      )}
+      <div className="aiBlock">
+        <h4>🎯 Needs intention</h4>
+        <p>
+          <strong>{weakest.name}</strong> is at {weakest.percent}% — try pairing
+          it with a strong habit or scheduling it earlier in the day.
+        </p>
+      </div>
+
+      <div className="aiBlock">
+        <h4>💡 Micro-advice</h4>
+        <p>
+          Aim for at least a 3-day streak in a row for your key habit. Tiny
+          streaks compound into big wins.
+        </p>
+      </div>
     </div>
   );
 }
