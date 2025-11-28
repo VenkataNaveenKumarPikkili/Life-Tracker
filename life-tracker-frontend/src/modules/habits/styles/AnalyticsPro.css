@@ -1,117 +1,93 @@
-/* src/modules/habits/styles/AnalyticsPro.css */
+/* src/styles/AnalyticsPro.css */
 
 .analyticsCard {
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 16px 18px 14px;
-  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  background: #fff;
+  border-radius: 18px;
+  padding: 18px;
+  margin-top: 12px;
+  width: 100%;
 }
 
+/* Header */
 .analyticsHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 8px;
 }
 
-.analyticsHeader .titleRow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.analyticsHeader .emoji {
+.title {
   font-size: 20px;
-}
-
-.analyticsHeader .title {
-  font-weight: 700;
-  font-size: 16px;
+  font-weight: 800;
+  color: #111827;
 }
 
 .avgChip {
-  background: #eff4ff;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 13px;
-  display: flex;
-  align-items: baseline;
-  gap: 4px;
-}
-
-.avgChip span {
+  background: #e7f0ff;
+  padding: 6px 12px;
+  border-radius: 25px;
   font-weight: 700;
-  color: #2563eb;
-}
-.avgChip small {
-  color: #6b7280;
+  font-size: 13px;
 }
 
+/* List */
 .analyticsList {
+  margin-top: 10px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  max-height: 260px;
-  overflow-y: auto;
-}
-.analyticsList::-webkit-scrollbar {
-  display: none;
+  gap: 12px;
 }
 
-.analyticsItem {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.analyticRow {
+  background: #f7faff;
+  padding: 12px;
+  border-radius: 14px;
 }
 
-.itemTopRow {
+.topRow {
   display: flex;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .habitName {
-  font-weight: 600;
   color: #111827;
 }
 
 .percentText {
-  color: #4b5563;
+  color: #111827;
 }
 
-.barWrapper {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.barBg {
-  flex: 1;
+/* Progress bar */
+.bar {
+  width: 100%;
   height: 6px;
-  border-radius: 999px;
-  background: #e5edff;
+  background: #dce9ff;
+  border-radius: 5px;
   overflow: hidden;
+  margin: 6px 0 4px;
 }
 
-.barFill {
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #22c55e, #16a34a);
+.fill {
+  height: 6px;
+  background: #4a8bff;
 }
 
-.streakPill {
-  font-size: 11px;
+/* Badge + hints */
+.badge {
+  font-size: 12px;
+  padding: 4px 10px;
   border-radius: 999px;
-  color: #ffffff;
-  padding: 2px 8px;
-  white-space: nowrap;
+  color: #fff;
+  display: inline-block;
+  margin-top: 2px;
 }
 
 .bestHint {
+  margin-top: 4px;
+  color: #4b5563;
   font-size: 11px;
-  color: #6b7280;
 }
 
 .emptyText {

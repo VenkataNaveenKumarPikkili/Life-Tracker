@@ -2,52 +2,53 @@
 import React, { useMemo } from "react";
 import "../styles/AnalyticsPro.css";
 
+// -------- streak helpers --------
 function calcStreak(tracker = [], days) {
+  let longest = 0;
   let current = 0;
-  let best = 0;
 
-  for (let day = 1; day <= days; day++) {
-    const done = tracker.find((t) => t.day === day && t.done);
+  for (let d = 1; d <= days; d++) {
+    const done = tracker.some((t) => t.day === d && t.done);
     if (done) {
-      current += 1;
-      if (current > best) best = current;
+      current++;
+      if (current > longest) longest = current;
     } else {
       current = 0;
     }
   }
 
-  // current streak = from last day backwards
-  let cur = 0;
-  for (let day = days; day >= 1; day--) {
-    const done = tracker.find((t) => t.day === day && t.done);
-    if (done) cur += 1;
+  // running streak from end backwards
+  let running = 0;
+  for (let d = days; d >= 1; d--) {
+    const done = tracker.some((t) => t.day === d && t.done);
+    if (done) running++;
     else break;
   }
-  return { current: cur, best };
+
+  return { current: running, best: longest };
 }
 
-function badgeFromStreak(streak) {
-  if (streak >= 21) return { label: "Legend", color: "#8b5cf6" };
-  if (streak >= 14) return { label: "Gold", color: "#f59e0b" };
-  if (streak >= 7) return { label: "Silver", color: "#38bdf8" };
-  if (streak >= 3) return { label: "Bronze", color: "#22c55e" };
-  if (streak >= 1) return { label: "Spark", color: "#a3a3a3" };
-  return { label: "Cold Start", color: "#9ca3af" };
+function badgeLevel(days) {
+  if (days >= 21) return { text: "Legend", color: "#7c3aed" };
+  if (days >= 14) return { text: "Gold", color: "#f59e0b" };
+  if (days >= 7) return { text: "Silver", color: "#38bdf8" };
+  if (days >= 3) return { text: "Bronze", color: "#22c55e" };
+  if (days >= 1) return { text: "Warm", color: "#9ca3af" };
+  return { text: "Cold Start", color: "#d1d5db" };
 }
 
 export default function AnalyticsPro({ habits, days }) {
   const stats = useMemo(() => {
-    if (!habits || habits.length === 0) return [];
+    if (!habits || habits.length === 0 || !days) return [];
 
     return habits
       .map((h) => {
         const tracker = h.tracker || [];
-        const doneCount = tracker.filter((t) => t.done).length;
-        const percent =
-          days > 0 ? Math.round((doneCount / days) * 100) : 0;
+        const doneCount = tracker.filter((t) => t.done && t.day <= days).length;
+        const percent = Math.round((doneCount / days) * 100);
 
         const { current, best } = calcStreak(tracker, days);
-        const badge = badgeFromStreak(current);
+        const badge = badgeLevel(current);
 
         return {
           name: h.name,
@@ -61,57 +62,46 @@ export default function AnalyticsPro({ habits, days }) {
   }, [habits, days]);
 
   const avg =
-    stats.length === 0
-      ? 0
-      : Math.round(
+    stats.length > 0
+      ? Math.round(
           stats.reduce((sum, s) => sum + s.percent, 0) / stats.length
-        );
+        )
+      : 0;
 
   return (
     <div className="analyticsCard">
       <div className="analyticsHeader">
-        <div className="titleRow">
-          <span className="emoji">📊</span>
-          <span className="title">Analytics</span>
-        </div>
+        <span className="title">📊 Analytics</span>
         <div className="avgChip">
-          <span>{avg}%</span>
-          <small>Avg</small>
+          <b>{avg}%</b> <small>Avg</small>
         </div>
       </div>
 
       {stats.length === 0 && (
-        <p className="emptyText">No data yet — start checking boxes ✅</p>
+        <p className="emptyText">
+          No data — tick some days in the grid to see stats 📈
+        </p>
       )}
 
       <div className="analyticsList">
         {stats.map((s, i) => (
-          <div className="analyticsItem" key={i}>
-            <div className="itemTopRow">
+          <div key={i} className="analyticRow">
+            <div className="topRow">
               <span className="habitName">
-                {s.name.length > 16
-                  ? s.name.slice(0, 16) + "…"
-                  : s.name}
+                {s.name.length > 16 ? s.name.slice(0, 16) + "…" : s.name}
               </span>
               <span className="percentText">{s.percent}%</span>
             </div>
 
-            <div className="barWrapper">
-              <div className="barBg">
-                <div
-                  className="barFill"
-                  style={{ width: `${s.percent}%` }}
-                />
-              </div>
-              <span
-                className="streakPill"
-                style={{ background: s.badge.color }}
-              >
-                🔥 {s.current}d • {s.badge.label}
-              </span>
+            <div className="bar">
+              <div className="fill" style={{ width: `${s.percent}%` }} />
             </div>
 
-            {s.best > 0 && (
+            <span className="badge" style={{ background: s.badge.color }}>
+              🔥 {s.current}d — {s.badge.text}
+            </span>
+
+            {s.best > 1 && (
               <div className="bestHint">
                 Best streak: {s.best} day{s.best > 1 ? "s" : ""}
               </div>
