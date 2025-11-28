@@ -1,65 +1,71 @@
-*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui;}
-body{background:#f5f6fa;}
+body{margin:0;font-family:Inter,system-ui;background:#eef3ff;}
+.dash{padding:28px;}
 
-.wrap{max-width:1300px;margin:60px auto;}
+header h1{font-size:38px;margin:0;font-weight:900;}
+header p{margin:0;margin-top:4px;color:#505a66;font-size:15px;}
 
-header h1{font-size:42px;font-weight:700;margin-bottom:4px;}
-header p{font-size:15px;color:#666;margin-bottom:35px;}
-
-/* Input Row */
-.inputRow{display:flex;gap:12px;margin-bottom:30px;}
-.inputRow input{
-  flex:1;padding:16px;border:1px solid #ddd;border-radius:8px;font-size:16px;
+.monthRow{
+    display:flex;justify-content:center;align-items:center;gap:18px;margin-top:18px;
 }
-.inputRow button{
-  background:#0061ff;color:#fff;font-weight:600;font-size:16px;
-  border:none;padding:16px 28px;border-radius:8px;cursor:pointer;
+.monthRow button{
+    background:#005fff;color:#fff;border-radius:8px;border:none;
+    font-size:15px;padding:6px 18px;font-weight:600;cursor:pointer;
 }
-.inputRow button:hover{background:#004ed0;}
+.monthRow h2{font-size:22px;font-weight:800;margin:0;color:#1f2b42;}
 
-/* ---------------- GRID TABLE ---------------- */
-
-.habitGrid{
-  background:white;border-radius:14px;padding:25px;
-  border:1px solid #e6e6e6;display:flex;flex-direction:column;gap:10px;
+.addBar{
+    display:flex;justify-content:center;gap:10px;margin:15px auto;width:420px;
 }
+.addBar input{flex:1;padding:10px;font-size:15px;border-radius:12px;border:2px solid #cedbff;}
+.addBar button{
+    background:#006aff;color:white;padding:10px 18px;border-radius:10px;font-weight:700;
+}
+
+
+/* ============ GRID LAYOUT ============ */
+.layout{
+    display:grid;grid-template-columns:1fr 320px;
+    gap:22px;height:70vh;margin-top:20px;
+}
+
+
+/* ===== HABIT TRACK TABLE ===== */
+.habits{
+    background:white;border-radius:14px;padding:12px;
+    overflow-y:auto;scrollbar-width:none;font-size:14px;
+}
+.habits::-webkit-scrollbar{display:none;}
 
 .row{
-  display:grid;
-  grid-template-columns: 160px repeat(30, 1fr) 40px;
-  align-items:center;
-  gap:4px;
-  padding:6px 0;
+    display:grid;grid-template-columns:140px repeat(31,26px) 32px;
+    align-items:center;gap:4px;padding:3px 0;
+}
+.row.head{
+    background:#f5f7ff;font-weight:700;position:sticky;top:0;z-index:5;
 }
 
-.head{border-bottom:1px solid #eee;padding-bottom:10px;margin-bottom:6px;}
+.name{font-weight:600;white-space:nowrap;overflow:hidden;}
+.dayNum{font-size:11px;text-align:center;color:#6c778a;}
 
-.habitNameCol{font-weight:600;color:#222;padding-left:4px;}
-
-.dayHead{text-align:center;color:#666;font-size:11px;}
-.dayHead b{display:block;font-size:12px;color:black;margin-top:2px;}
-
-.dayCell{text-align:center;}
-.dayCell input{
-  width:17px;height:17px;cursor:pointer;accent-color:#2ecc71;
+.cell{
+    height:22px;width:22px;border-radius:6px;background:#dae8ff;
+    cursor:pointer;text-align:center;line-height:22px;color:transparent;font-weight:700;
 }
+.cell.ok{background:#1ac15e;color:white;}
 
-/* Delete */
 .del{
-  background:#ff4d4d;color:#fff;border:none;border-radius:6px;
-  cursor:pointer;font-size:14px;height:26px;
+    background:#ff475a;border:none;color:white;border-radius:6px;cursor:pointer;
+    width:26px;height:26px;font-weight:700;
 }
-.del:hover{background:#d93636;}
 
-/* ANALYTICS */
-.analytics{
-  background:white;border-radius:14px;padding:25px;
-  border:1px solid #e6e6e6;margin-top:40px;max-width:450px;
+
+/* ====== RIGHT PANEL ====== */
+.rightPanel{
+    display:flex;flex-direction:column;gap:15px;height:100%;
+    overflow-y:auto;scrollbar-width:none;
 }
-.analytics h2{margin-bottom:18px;font-weight:600;font-size:22px;}
+.rightPanel::-webkit-scrollbar{display:none;}
 
-.stat{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
-.stat span{width:120px;font-size:15px;}
-.bar{flex:1;height:8px;background:#eaeaea;border-radius:20px;overflow:hidden;}
-.bar div{background:#2ecc71;height:100%;border-radius:20px;transition:.3s;}
-.stat p{width:40px;text-align:right;font-weight:600;}
+.rightPanel>*{
+    background:white;border-radius:14px;padding:18px;
+}

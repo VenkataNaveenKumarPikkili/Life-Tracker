@@ -3,5 +3,3 @@
 [HPM] Proxy created: /  -> http://localhost:8001
 [HPM] Proxy created: /  -> http://localhost:8001
 🚀 API Gateway Live on http://localhost:8000
-(node:243353) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)

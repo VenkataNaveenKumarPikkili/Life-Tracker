@@ -1,98 +1,174 @@
-import { useState, useEffect } from "react";
+// src/modules/habits/pages/HabitDashboard.jsx
+import React, { useState, useEffect } from "react";
+import AnalyticsPro from "../components/AnalyticsPro";
+import AICoachV3 from "../components/AICoachV3";
 import "../styles/habits.css";
 
-const days = [...Array(30)].map((_, i) => i + 1);
-const week = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-
 export default function HabitDashboard() {
-  const [habits, setHabits] = useState(() =>
-    JSON.parse(localStorage.getItem("habit_app_v5") || "[]")
+  const [habits, setHabits] = useState(
+    JSON.parse(localStorage.getItem("habits") || "[]")
   );
-  const [newHabit, setNewHabit] = useState("");
 
+  const [habitInput, setHabitInput] = useState("");
+
+  const today = new Date();
+  const [month, setMonth] = useState(today.getMonth());
+  const [year, setYear] = useState(today.getFullYear());
+
+  const days = new Date(year, month + 1, 0).getDate();
+
+  // Persist in localStorage
   useEffect(() => {
-    localStorage.setItem("habit_app_v5", JSON.stringify(habits));
+    localStorage.setItem("habits", JSON.stringify(habits));
   }, [habits]);
 
-  const addHabit = () => {
-    if (!newHabit.trim()) return;
-    setHabits([...habits, { name: newHabit, days: Array(30).fill(false) }]);
-    setNewHabit("");
+  function addHabit() {
+    const name = habitInput.trim();
+    if (!name) return;
+
+    setHabits((prev) => [
+      ...prev,
+      {
+        name,
+        tracker: [], // {day, done: true}
+      },
+    ]);
+    setHabitInput("");
+  }
+
+  function toggleDay(habitIndex, day) {
+    setHabits((prev) => {
+      const copy = [...prev];
+      const habit = copy[habitIndex];
+
+      const tracker = habit.tracker || [];
+      const existingIndex = tracker.findIndex((t) => t.day === day);
+
+      if (existingIndex >= 0) {
+        tracker[existingIndex] = {
+          ...tracker[existingIndex],
+          done: !tracker[existingIndex].done,
+        };
+      } else {
+        tracker.push({ day, done: true });
+      }
+
+      habit.tracker = tracker;
+      copy[habitIndex] = habit;
+      return copy;
+    });
+  }
+
+  function removeHabit(index) {
+    setHabits((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  const goNextMonth = () => {
+    if (month === 11) {
+      setMonth(0);
+      setYear((y) => y + 1);
+    } else {
+      setMonth((m) => m + 1);
+    }
   };
 
-  const toggleDay = (hi, di) => {
-    const clone = structuredClone(habits);
-    clone[hi].days[di] = !clone[hi].days[di];
-    setHabits(clone);
+  const goPrevMonth = () => {
+    if (month === 0) {
+      setMonth(11);
+      setYear((y) => y - 1);
+    } else {
+      setMonth((m) => m - 1);
+    }
   };
 
-  const remove = (i) => setHabits(habits.filter((_,x)=>x!==i));
-  const progress = arr => ((arr.filter(Boolean).length / 30) * 100).toFixed(0);
+  const monthLabel = new Date(year, month).toLocaleString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
 
   return (
-    <div className="wrap">
-
+    <div className="dash">
       <header>
-        <h1>Habit Dashboard</h1>
-        <p>Clean • Balanced • PRO Productivity UI</p>
+        <h1>🔥 Habit Dashboard PRO MAX V7</h1>
+        <p>Elite • Stable • No Popup • Perfect Alignment • Streaks ON 🔥</p>
       </header>
 
-      <div className="inputRow">
-        <input placeholder="Add habit..." 
-          value={newHabit}
-          onChange={e=>setNewHabit(e.target.value)}
-        />
-        <button onClick={addHabit}>Add Habit</button>
+      {/* Month row */}
+      <div className="monthRow">
+        <button onClick={goPrevMonth}>← Prev</button>
+        <h2>{monthLabel}</h2>
+        <button onClick={goNextMonth}>Next →</button>
       </div>
 
-      {/* -------- TABLE -------- */}
-      <div className="habitGrid">
+      {/* Add habit bar */}
+      <div className="addBar">
+        <input
+          value={habitInput}
+          maxLength={40}
+          placeholder="Add new habit…"
+          onChange={(e) => setHabitInput(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && addHabit()}
+        />
+        <button onClick={addHabit}>Add +</button>
+      </div>
 
-        {/* HEADER */}
-        <div className="row head">
-          <div className="habitNameCol">Habit</div>
-          {days.map((d,i)=>(
-            <div key={i} className="dayHead">
-              <span>{week[i%7]}</span>
-              <b>{d}</b>
-            </div>
-          ))}
-          <div></div>
-        </div>
-
-        {/* BODY */}
-        {habits.map((h,i)=>(
-          <div key={i} className="row">
-            <div className="habitNameCol">{h.name}</div>
-
-            {h.days.map((v,d)=>(
-              <div key={d} className="dayCell">
-                <input type="checkbox" checked={v} onChange={()=>toggleDay(i,d)} />
+      <div className="layout">
+        {/* HABIT GRID */}
+        <main className="habits">
+          {/* header row */}
+          <div className="row head">
+            <div className="name">Habit</div>
+            {Array.from({ length: days }, (_, i) => (
+              <div className="dayNum" key={i}>
+                {i + 1}
               </div>
             ))}
-
-            <button className="del" onClick={()=>remove(i)}>✕</button>
+            <div></div>
           </div>
-        ))}
 
+          {/* habit rows */}
+          {habits.map((habit, i) => (
+            <div className="row" key={i}>
+              <div className="name" title={habit.name}>
+                {habit.name.length > 14
+                  ? habit.name.slice(0, 14) + "…"
+                  : habit.name}
+              </div>
+
+              {Array.from({ length: days }, (_, d) => {
+                const tracker = habit.tracker || [];
+                const record = tracker.find((t) => t.day === d + 1);
+                const done = !!record?.done;
+                return (
+                  <div
+                    key={d}
+                    className={`cell ${done ? "ok" : ""}`}
+                    onClick={() => toggleDay(i, d + 1)}
+                  >
+                    {done ? "✔" : ""}
+                  </div>
+                );
+              })}
+
+              <button className="del" onClick={() => removeHabit(i)}>
+                ✕
+              </button>
+            </div>
+          ))}
+
+          {habits.length === 0 && (
+            <div className="emptyHint">
+              Start by adding your first habit above 👆
+            </div>
+          )}
+        </main>
+
+        {/* RIGHT PANEL  */}
+        <aside className="rightPanel">
+          <AnalyticsPro habits={habits} days={days} />
+          <AICoachV3 habits={habits} days={days} />
+        </aside>
       </div>
-
-
-      {/* -------- ANALYTICS -------- */}
-      <section className="analytics">
-        <h2>📊 Analytics Overview</h2>
-
-        {habits.length===0 && <p>No habits yet</p>}
-
-        {habits.map((h,i)=>(
-          <div className="stat" key={i}>
-            <span>{h.name}</span>
-            <div className="bar"><div style={{width:`${progress(h.days)}%`}} /></div>
-            <p>{progress(h.days)}%</p>
-          </div>
-        ))}
-      </section>
-
     </div>
   );
 }

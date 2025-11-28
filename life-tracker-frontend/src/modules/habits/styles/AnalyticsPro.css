@@ -1,0 +1,120 @@
+/* src/modules/habits/styles/AnalyticsPro.css */
+
+.analyticsCard {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 16px 18px 14px;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.analyticsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.analyticsHeader .titleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.analyticsHeader .emoji {
+  font-size: 20px;
+}
+
+.analyticsHeader .title {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.avgChip {
+  background: #eff4ff;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.avgChip span {
+  font-weight: 700;
+  color: #2563eb;
+}
+.avgChip small {
+  color: #6b7280;
+}
+
+.analyticsList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+.analyticsList::-webkit-scrollbar {
+  display: none;
+}
+
+.analyticsItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.itemTopRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.habitName {
+  font-weight: 600;
+  color: #111827;
+}
+
+.percentText {
+  color: #4b5563;
+}
+
+.barWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.barBg {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: #e5edff;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+}
+
+.streakPill {
+  font-size: 11px;
+  border-radius: 999px;
+  color: #ffffff;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+.bestHint {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.emptyText {
+  font-size: 13px;
+  color: #6b7280;
+}
